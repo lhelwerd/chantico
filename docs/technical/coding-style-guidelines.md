@@ -1,0 +1,223 @@
+---
+title: "Development & Coding style guidelines"
+weight: 10
+main:
+  parent: technical
+---
+
+This document defines the coding standards, tooling expectations, and 
+development practices for this project. The goal is to maintain consistency, 
+readability, and long-term maintainability while keeping the rules lightweight 
+and tool-driven.
+
+# Philosophy
+
+This project follows standard Go conventions. We focus on the following 
+principles:
+
+- Clarity over cleverness
+- Simple and readable code and designs over abstract ones in binary formats
+- Tool-enforced rules over manual enforcement
+- Consistency across the codebase over personal style preferences
+
+That is, the there is still value in the concepts on the right, we prioritize 
+the left when there is a tension between them.
+
+Where possible, formatting and correctness should be checked automatically via 
+tooling and editor integration.
+
+# Code format and typing correctness
+
+All code should be formatted and validated before being included into the main 
+repository.
+
+## Tools
+
+- `go fmt ./...` or `make fmt` (formatting)
+- `go vet ./...` or `make vet` (static correctness checks)
+
+## Recommended workflow
+
+Run before committing (or before merging if you find there are still issues):
+
+```bash
+make fmt       # runs go fmt ./...
+make vet       # runs go vet ./...
+make test      # runs unit tests
+./dev/setup.sh # sets up a new cluster as indicated in local development guide
+make run       # runs the application for manual testing
+```
+
+### Integration
+
+Several editors support automatic formatting on save. We recommend configuring 
+your editor to run `go fmt` on save to ensure consistent formatting. Have a look 
+at the following:
+
+- [VSCode Go extension](https://code.visualstudio.com/docs/languages/go)
+- Neovim: Install [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) and 
+  then install `gopls`: `go install golang.org/x/tools/gopls@latest`
+
+### Rules
+
+* All code must pass `fmt`, `vet`, and lint checks
+* Avoid disputes about formatting, so `go fmt` is authoritative
+* CI should enforce these checks
+
+---
+
+# Code structure and readability
+
+Go favors explicit and simple code structure.
+
+## Functions
+
+* Prefer small, focused functions
+* Aim for functions that do **one thing well**
+* As a guideline (not a strict rule):
+
+  * ~20–50 lines per function is healthy
+* Avoid deep nesting; prefer early returns
+
+### Preferred pattern
+
+Use early returns:
+
+```go
+if err != nil {
+    return err # Or more specific information/return values
+}
+```
+
+instead of deeply nested logic.
+
+## Complexity
+
+- Avoid high cyclomatic complexity: Not too many (nested) `if` branches or 
+  complicated loops with too many exit points. There is no strict threshold 
+  currently pending choices regarding code style tooling for this, but try not 
+  to scatter these around too much.
+- Prefer splitting logic into helper functions over large monolithic blocks
+- Complexity should be primarily enforced via linting tools
+
+# Naming conventions
+
+- Use clear, descriptive names for variables, functions and types. We are 
+  continuously in the process or reviewing and renaming some of the existing 
+  resources, such as how we name our controllers and the resources they manage. 
+  This is to make it clearer what their scope is and how they relate to the 
+  objects/concepts that they represent.
+- Avoid abbreviations unless widely understood (e.g., `cfg` for configuration, 
+  `err` for error).
+- Prefer `resourceID` instead of `rid` or `configPath` instead of `cfgp`
+
+Package names should be:
+
+- Lowercase with no underscores or mixed caps, while filenames can have 
+  underscores but `*_test.go` is reserved for test files.
+- A single word where possible, or a combination of words that are closely 
+  related (a noun phrase).
+- Short but meaningful.
+
+# Error handling and reporting
+
+Errors should be explicitly handled. Do not ignore errors using `_` unless 
+justified in the code or comments. Prefer returning errors up to the caller, or 
+log the error using a standard structured logging approach. If the error is 
+a critical failure, consider using a panic or postmortem package.
+
+# Documentation
+
+## Public APIs
+
+All exported functions, types, and packages should include GoDoc-style comments.
+
+Example:
+
+```go
+// WriteSNMPConfig writes a new configuration file in the volume location.
+func WriteSNMPConfig(fileName string) error {
+```
+
+For current development, the focus here is on the `api` directory, but we aim to 
+also do this for other packages.
+
+## Guidelines
+
+- Explain why, not just what
+- Keep comments concise and relevant
+- Avoid redundant comments that restate code
+
+# Testing
+
+Testing is required for all meaningful logic.
+
+## Current workflow
+
+At minimum, one of the following is expected:
+
+- Unit tests for separate functions in the internal logic, OR
+- A documented, reproducible execution flow (test by example/steps to run)
+
+## Test expectations
+
+- Use Go's built-in testing framework
+- Tests should be deterministic and independent
+- Prefer table-driven tests where appropriate
+
+## Future direction
+
+The project plans to evolve toward:
+
+- Higher unit test coverage
+- Integration tests
+- End-to-end testing in CI pipelines
+
+# Code Review Expectations
+
+All changes must go through pull request review.
+
+Reviewers should focus on:
+
+- Correctness
+- Readability
+- Maintainability
+- Test coverage
+- Adherence to this document
+
+Style debates should be resolved by existing tooling reporting, this document, 
+or Go idioms, rather than with subjective discussions.
+
+# Documentation
+
+- Documentation should be kept up to date with code changes.
+- Public-facing features should include explanation of how to use the feature, 
+  how to run/test it, and minimal example files to achieve this (such as sample 
+  resources). This depends on the type of feature, but is generally recommended.
+- Complex logic in functions should include inline clarification: if you need to 
+  think about it to understand it, it should be explained in the code.
+
+# CI pipeline expectations for pull requests
+
+Pull requests must pass most of the pipeline jobs before merging. At minimum, 
+the test and linting jobs must pass, and the documentation jobs should not fail 
+(this includes checking for broken links). However, some jobs might occasionally 
+fail due to external factors such as detected vulnerabilities in dependencies or 
+temporary issues with external services.
+
+In the end, it is up to the contributor and maintainer to weigh the current 
+risks and benefits of merging a pull request if some steps are failing. 
+Sometimes it may be better to create a separate issue to address the problems 
+that are encountered, as it would otherwise affect other work as well.
+
+# Future changes of the guidelines
+
+This project is in an incubation and initial startup phase. These rules will 
+evolve over time once the project becomes more adopted in open source.
+
+Future versions may include:
+
+- More clarified thresholds in code style rules
+- Complexity limits via CI integration
+- Expanded unit/integration testing requirements
+
