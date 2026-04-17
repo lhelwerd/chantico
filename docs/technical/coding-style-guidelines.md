@@ -1,6 +1,6 @@
 ---
 title: "Development & Coding style guidelines"
-weight: 10
+weight: 25
 main:
   parent: technical
 ---
@@ -10,7 +10,7 @@ development practices for this project. The goal is to maintain consistency,
 readability, and long-term maintainability while keeping the rules lightweight 
 and tool-driven.
 
-# Philosophy
+## Philosophy
 
 This project follows standard Go conventions. We focus on the following 
 principles:
@@ -26,17 +26,17 @@ the left when there is a tension between them.
 Where possible, formatting and correctness should be checked automatically via 
 tooling and editor integration.
 
-# Code format and typing correctness
+## Code format and typing correctness
 
 All code should be formatted and validated before being included into the main 
 repository.
 
-## Tools
+### Tools
 
 - `go fmt ./...` or `make fmt` (formatting)
 - `go vet ./...` or `make vet` (static correctness checks)
 
-## Recommended workflow
+### Recommended workflow
 
 Run before committing (or before merging if you find there are still issues):
 
@@ -48,7 +48,7 @@ make test      # runs unit tests
 make run       # runs the application for manual testing
 ```
 
-### Integration
+#### Integration
 
 Several editors support automatic formatting on save. We recommend configuring 
 your editor to run `go fmt` on save to ensure consistent formatting. Have a look 
@@ -58,28 +58,27 @@ at the following:
 - Neovim: Install [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) and 
   then install `gopls`: `go install golang.org/x/tools/gopls@latest`
 
-### Rules
+#### Rules
 
-* All code must pass `fmt`, `vet`, and lint checks
-* Avoid disputes about formatting, so `go fmt` is authoritative
-* CI should enforce these checks
+- All code should pass `fmt`, `vet`, and lint checks
+- Avoid disputes about formatting, so tooling is authoritative
+- CI should enforce these checks
 
----
-
-# Code structure and readability
+## Code structure and readability
 
 Go favors explicit and simple code structure.
 
-## Functions
+### Functions
 
-* Prefer small, focused functions
-* Aim for functions that do **one thing well**
-* As a guideline (not a strict rule):
+- Prefer small, focused functions
+- Aim for functions that do **one thing well**
+- As a guideline (not a strict rule): about 20 to 50 lines per function or 
+  related units (if you have many small "getter" functions, they should be 
+  grouped together in a larger block); if it fits on one screen without 
+  scrolling and is still easy to follow, then it is probably fine
+- Avoid deep nesting; prefer early returns
 
-  * ~20–50 lines per function is healthy
-* Avoid deep nesting; prefer early returns
-
-### Preferred pattern
+#### Preferred pattern
 
 Use early returns:
 
@@ -91,7 +90,7 @@ if err != nil {
 
 instead of deeply nested logic.
 
-## Complexity
+### Complexity
 
 - Avoid high cyclomatic complexity: Not too many (nested) `if` branches or 
   complicated loops with too many exit points. There is no strict threshold 
@@ -100,7 +99,7 @@ instead of deeply nested logic.
 - Prefer splitting logic into helper functions over large monolithic blocks
 - Complexity should be primarily enforced via linting tools
 
-# Naming conventions
+## Naming conventions
 
 - Use clear, descriptive names for variables, functions and types. We are 
   continuously in the process or reviewing and renaming some of the existing 
@@ -119,16 +118,32 @@ Package names should be:
   related (a noun phrase).
 - Short but meaningful.
 
-# Error handling and reporting
+## Error handling and reporting
 
 Errors should be explicitly handled. Do not ignore errors using `_` unless 
 justified in the code or comments. Prefer returning errors up to the caller, or 
 log the error using a standard structured logging approach. If the error is 
 a critical failure, consider using a panic or postmortem package.
 
-# Documentation
+## Documentation
 
-## Public APIs
+Our goal with documentation is to explain why we choose do something, not just 
+what we are doing. We have public-facing documentation in Markdown to explain 
+milestones and technical design choices. In code, keep comments concise and 
+relevant, and focus on explaining the intent and rationale behind the code 
+rather than describing what the code is doing; the code itself should be clear 
+enough unless it becomes very complicated. Basically, avoid redundant comments 
+and documentation that restates code since this is also tough to keep up to date 
+when changes are made.
+
+- Documentation should be kept up to date with code changes.
+- Public-facing features should include explanation of how to use the feature, 
+  how to run/test it, and minimal example files to achieve this (such as sample 
+  resources). This depends on the type of feature, but is generally recommended.
+- Complex logic in functions should include inline clarification: if you need to 
+  think about it to understand it, it should be explained in the code.
+
+### Public APIs
 
 All exported functions, types, and packages should include GoDoc-style comments.
 
@@ -142,30 +157,24 @@ func WriteSNMPConfig(fileName string) error {
 For current development, the focus here is on the `api` directory, but we aim to 
 also do this for other packages.
 
-## Guidelines
+## Testing
 
-- Explain why, not just what
-- Keep comments concise and relevant
-- Avoid redundant comments that restate code
+Testing is necessary for all additions and changes of meaningful logic.
 
-# Testing
-
-Testing is required for all meaningful logic.
-
-## Current workflow
+### Current workflow
 
 At minimum, one of the following is expected:
 
 - Unit tests for separate functions in the internal logic, OR
 - A documented, reproducible execution flow (test by example/steps to run)
 
-## Test expectations
+### Test expectations
 
 - Use Go's built-in testing framework
 - Tests should be deterministic and independent
 - Prefer table-driven tests where appropriate
 
-## Future direction
+### Future direction
 
 The project plans to evolve toward:
 
@@ -173,7 +182,7 @@ The project plans to evolve toward:
 - Integration tests
 - End-to-end testing in CI pipelines
 
-# Code Review Expectations
+### Code review expectations
 
 All changes must go through pull request review.
 
@@ -188,16 +197,7 @@ Reviewers should focus on:
 Style debates should be resolved by existing tooling reporting, this document, 
 or Go idioms, rather than with subjective discussions.
 
-# Documentation
-
-- Documentation should be kept up to date with code changes.
-- Public-facing features should include explanation of how to use the feature, 
-  how to run/test it, and minimal example files to achieve this (such as sample 
-  resources). This depends on the type of feature, but is generally recommended.
-- Complex logic in functions should include inline clarification: if you need to 
-  think about it to understand it, it should be explained in the code.
-
-# CI pipeline expectations for pull requests
+### CI pipeline expectations for pull requests
 
 Pull requests must pass most of the pipeline jobs before merging. At minimum, 
 the test and linting jobs must pass, and the documentation jobs should not fail 
@@ -210,7 +210,7 @@ risks and benefits of merging a pull request if some steps are failing.
 Sometimes it may be better to create a separate issue to address the problems 
 that are encountered, as it would otherwise affect other work as well.
 
-# Future changes of the guidelines
+## Future changes of the guidelines
 
 This project is in an incubation and initial startup phase. These rules will 
 evolve over time once the project becomes more adopted in open source.
@@ -220,4 +220,3 @@ Future versions may include:
 - More clarified thresholds in code style rules
 - Complexity limits via CI integration
 - Expanded unit/integration testing requirements
-
