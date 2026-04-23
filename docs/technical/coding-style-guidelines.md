@@ -12,16 +12,13 @@ and tool-driven.
 
 ## Philosophy
 
-This project follows standard Go conventions. We focus on the following 
+This project follows standard Go conventions. We prioritize the following 
 principles:
 
 - Clarity over cleverness
 - Simple and readable code and designs over abstract ones in binary formats
 - Tool-enforced rules over manual enforcement
 - Consistency across the codebase over personal style preferences
-
-That is, the there is still value in the concepts on the right, we prioritize 
-the left when there is a tension between them.
 
 Where possible, formatting and correctness should be checked automatically via 
 tooling and editor integration.
@@ -61,7 +58,8 @@ at the following:
 #### Rules
 
 - All code should pass `fmt`, `vet`, and lint checks
-- Avoid disputes about formatting, so tooling is authoritative
+- Avoid long discussions on formatting style or structures; upon disagreement, 
+  use formatting tools for a consistent style and code correctness
 - CI should enforce these checks
 
 ## Code structure and readability
@@ -90,25 +88,27 @@ if err != nil {
 
 instead of deeply nested logic.
 
-### Complexity
+#### Function complexity
 
-- Avoid high cyclomatic complexity: Not too many (nested) `if` branches or 
-  complicated loops with too many exit points. There is no strict threshold 
-  currently pending choices regarding code style tooling for this, but try not 
-  to scatter these around too much.
+- Avoid high cyclomatic complexity: Reduce the number of (nested) `if` branches 
+  inside one function. Similarly, `for` loops should not become too complicated 
+  with many different conditions upon which the loop may be exited early. There 
+  is no strict threshold currently pending choices regarding code style tooling 
+  for this, but try not to scatter these around too much.
 - Prefer splitting logic into helper functions over large monolithic blocks
 - Complexity should be primarily enforced via linting tools
 
 ## Naming conventions
 
-- Use clear, descriptive names for variables, functions and types. We are 
-  continuously in the process or reviewing and renaming some of the existing 
-  resources, such as how we name our controllers and the resources they manage. 
-  This is to make it clearer what their scope is and how they relate to the 
-  objects/concepts that they represent.
-- Avoid abbreviations unless widely understood (e.g., `cfg` for configuration, 
-  `err` for error).
-- Prefer `resourceID` instead of `rid` or `configPath` instead of `cfgp`
+- Use clear, descriptive names for variables, functions and types. We may 
+  occasionally review and consider renaming some of the existing resources, such 
+  as how we name our controllers and the resources they manage. This is to make 
+  it clearer what their scope is and how they relate to the objects/concepts 
+  that they represent. At some point, a stable API should have clear naming that 
+  remains the same for a longer time.
+- Avoid abbreviations unless widely understood (e.g., `cfg` for configuration 
+  and `err` for error are okay, but use `resourceID` instead of `rid` or 
+  `configPath` instead of `cfgp`).
 
 Package names should be:
 
@@ -140,8 +140,8 @@ when changes are made.
 - Public-facing features should include explanation of how to use the feature, 
   how to run/test it, and minimal example files to achieve this (such as sample 
   resources). This depends on the type of feature, but is generally recommended.
-- Complex logic in functions should include inline clarification: if you need to 
-  think about it to understand it, it should be explained in the code.
+- Complex logic should include inline clarification: if you need to think about 
+  it to understand it, it should be explained in the code.
 
 ### Public APIs
 
