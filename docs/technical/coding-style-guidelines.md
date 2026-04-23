@@ -45,6 +45,16 @@ make test      # runs unit tests
 make run       # runs the application for manual testing
 ```
 
+Alternatively, you can install a pre-commit hook to run these checks 
+automatically before each commit. Note: This framework requires Python and pip 
+to be installed, the example below assumes a globally installed pip.
+
+```bash
+pip install --user --break-system-packages pre-commit # Install pre-commit
+pre-commit install                                    # Install pre-commit hooks
+git commit                                            # Run checks upon commit
+```
+
 #### Integration
 
 Several editors support automatic formatting on save. We recommend configuring 
