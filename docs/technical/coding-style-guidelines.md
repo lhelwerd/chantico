@@ -32,18 +32,23 @@ repository.
 
 - `go fmt ./...` or `make fmt` (formatting)
 - `go vet ./...` or `make vet` (static correctness checks)
+- `golangci-lint run` (optional, for more comprehensive linting, requires 
+  [installation](https://golangci-lint.run/docs/welcome/install/local/))
 
 ### Recommended workflow
 
 Run before committing (or before merging if you find there are still issues):
 
 ```bash
-make fmt       # runs go fmt ./...
-make vet       # runs go vet ./...
-make test      # runs unit tests
-./dev/setup.sh # sets up a new cluster as indicated in local development guide
-make run       # runs the application for manual testing
+make fmt          # runs go fmt ./...
+make vet          # runs go vet ./...
+golangci-lint run # runs golangci-lint (optional)
+make test         # runs unit tests
+./dev/setup.sh    # sets up a new cluster as indicated in local development guide
+make run          # runs the application for manual testing
 ```
+
+#### Optional pre-commit hooks
 
 Alternatively, you can install a pre-commit hook to run these checks 
 automatically before each commit. Note: This framework requires Python and pip 
@@ -67,7 +72,7 @@ at the following:
 
 #### Rules
 
-- All code should pass `fmt`, `vet`, and lint checks
+- All code should pass `fmt` and `vet` checks
 - Avoid long discussions on formatting style or structures; upon disagreement, 
   use formatting tools for a consistent style and code correctness
 - CI should enforce these checks
@@ -80,10 +85,13 @@ Go favors explicit and simple code structure.
 
 - Prefer small, focused functions
 - Aim for functions that do **one thing well**
-- As a guideline (not a strict rule): about 20 to 50 lines per function or 
-  related units (if you have many small "getter" functions, they should be 
-  grouped together in a larger block); if it fits on one screen without 
-  scrolling and is still easy to follow, then it is probably fine
+- If you have many small "getter" functions, group them together in the file to 
+  form a block of related functions.
+- As a guideline: the majority of functions should not be more than 15 lines, 
+  75% of the functions should not be more than 30 lines, and only rare functions 
+  should be above 60 lines per function.
+- If it fits on one screen without scrolling and is still easy to follow, then 
+  it is probably fine.
 - Avoid deep nesting; prefer early returns
 
 #### Preferred pattern
@@ -98,13 +106,30 @@ if err != nil {
 
 instead of deeply nested logic.
 
-#### Function complexity
+#### Function and module complexity
 
 - Avoid high cyclomatic complexity: Reduce the number of (nested) `if` branches 
   inside one function. Similarly, `for` loops should not become too complicated 
   with many different conditions upon which the loop may be exited early. There 
   is no strict threshold currently pending choices regarding code style tooling 
   for this, but try not to scatter these around too much.
+- In particular, reduce the [McCabe cyclomatic 
+  complexity](https://dev.to/l_walid/understanding-cyclomatic-complexity-in-go-a-comprehensive-guide-2lpl) 
+  of functions: most functions should have a complexity of 5 or less, only rare 
+  functions should be around 10 and 25 is a hard limit. You can check this 
+  McCabe cyclomatic complexity by installing `gocyclo`:
+
+```bash
+go install github.com/fzipp/gocyclo/cmd/gocyclo@latest # Install gocyclo
+gocyclo -over 5 ./...                                  # Reports complexity >5
+```
+
+- Avoid functions with a large number of parameters: Most functions should have 
+  3 or fewer parameters, and only rare functions should have around 5. There are 
+  linters such as `revive` in `golangci-lint` to check for this.
+- Modules should not have too many dependencies. If you find that a module has 
+  many (external) imports, then consider moving logical parts of the module into 
+  a new reusable module. Most modules should not have more than 10 imports.
 - Prefer splitting logic into helper functions over large monolithic blocks
 - Complexity should be primarily enforced via linting tools
 
