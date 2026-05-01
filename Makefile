@@ -3,7 +3,7 @@
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 0.5.5
+VERSION ?= 0.5.6
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
@@ -149,7 +149,7 @@ docker-push: ## Push docker image with the manager.
 	$(CONTAINER_TOOL) push ${IMG}
 
 HELM_CHART_DIR ?= config/deployment
-GHCR_HELM_REPO ?= oci://ghcr.io/tno-misd/charts
+GHCR_HELM_REPO ?= oci://ghcr.io/chantico-project/charts
 
 .PHONY: helm-package
 helm-package: sync-deployment-crds ## Package Helm chart.
