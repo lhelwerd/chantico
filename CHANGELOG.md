@@ -1,3 +1,25 @@
+## 0.5.7 (2026-05-22)
+
+#### Bug Fixes
+
+* **ci:** Only run docker build and push on source repository (681fe9e2)
+* Ensure CRDs and full image registries are included in Helm package (#123) (7f64dc29)
+* change GitLab image references to GitHub counterparts. (#117) (0de94c5f)
+* **ci:** Replace GitHub token for release and push with service account (ed9e22d1)
+* Correct semantic release call and push (dcda39c4)
+* Change reference to GitLab pages to be Github instead. (4e926072)
+* Update old Gitlab references to Github. (158ed132)
+
+#### Chores
+
+* **ci:** Use GitHub CLI to create release from single semantic release (37a0b0bd)
+* Add cleanup policy and push PR images to separate registry name (#119) (2176c2dc)
+* **ci:** Only run docker CI step from PR inside Chantico repo. (#128) (5213a2c7)
+* **docs:** Changed license for documentation to CC-BY 4.0. (#127) (e0e4314c)
+* Introduce Github templates (#112) (8c239660)
+* **ci:** Remove GitLab CI (ac1462b1)
+* **ci:** Adapt CI/CD to GitHub Actions (b6018ba9)
+
 ## 0.5.10 (2026-05-18)
 
 #### Bug Fixes
